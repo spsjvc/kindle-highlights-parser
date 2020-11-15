@@ -1,7 +1,7 @@
 {
   "name": "kindle-clippings-parser",
   "version": "1.0.0",
-  "description": "Simple tool to parse clippings from your Kindle.",
+  "description": "A simple tool to parse clippings from your Kindle.",
   "main": "src/parser.js",
   "author": "Dragiša Spasojević",
   "license": "MIT",
