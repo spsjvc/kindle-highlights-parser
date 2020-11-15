@@ -1,4 +1,4 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
@@ -6,7 +6,7 @@ const minimist = require('minimist');
 
 async function tryReadFile(file) {
   try {
-    return await fs.readFile(file, 'utf-8');
+    return await fs.promises.readFile(file, 'utf-8');
   } catch (error) {
     console.error('❌ Invalid input file!');
     process.exit(1);
@@ -14,7 +14,7 @@ async function tryReadFile(file) {
 }
 
 (async () => {
-  const { input } = minimist(process.argv.slice(2));
+  const { input, pages = true } = minimist(process.argv.slice(2));
 
   const content = await tryReadFile(input);
   const clippings = content.split('==========');
@@ -51,12 +51,12 @@ async function tryReadFile(file) {
   });
 
   try {
-    await fs.access('output');
+    await fs.promises.access('output');
   } catch (error) {
-    await fs.mkdir('output');
+    await fs.promises.mkdir('output');
   }
 
-  await fs.writeFile(
+  await fs.promises.writeFile(
     'output' + path.sep + 'clippings.json',
     JSON.stringify(highlightsMap, null, 2)
   );
@@ -64,14 +64,19 @@ async function tryReadFile(file) {
   Object.entries(highlightsMap).forEach(async ([title, highlights]) => {
     const file = 'output' + path.sep + title + '.txt';
 
-    await fs.writeFile(file, title);
-    await fs.appendFile(file, os.EOL + os.EOL);
+    // Remove the previous version
+    await fs.promises.unlink(file);
+
+    const stream = fs.createWriteStream(file, { flags: 'a' });
+
+    stream.write(title + os.EOL + os.EOL);
 
     highlights.forEach(async (highlight) => {
-      await fs.appendFile(
-        file,
-        'Page ' + highlight.page + os.EOL + highlight.text + os.EOL + os.EOL
-      );
+      if (pages) {
+        stream.write('Page ' + highlight.page + os.EOL);
+      }
+
+      stream.write(highlight.text + os.EOL + os.EOL);
     });
   });
 

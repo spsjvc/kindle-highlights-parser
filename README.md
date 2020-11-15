@@ -5,8 +5,13 @@ A simple tool to parse clippings from your Kindle.
 ## Usage
 
 ```
-node ./src/parser.js --input=/Users/spsjvc/Desktop/clippings.txt
+node ./src/parser.js --input /Users/spsjvc/Desktop/clippings.txt
 ```
+
+### Arguments
+
+- `--input` Path to the clippings file.
+- `--no-pages` Omits the page numbers from the output.
 
 ## Examples
 
