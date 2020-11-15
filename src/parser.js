@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const os = require('os');
 
 const minimist = require('minimist');
 
@@ -64,12 +65,12 @@ async function tryReadFile(file) {
     const file = 'output' + path.sep + title + '.txt';
 
     await fs.writeFile(file, title);
-    await fs.appendFile(file, '\r\n\r\n');
+    await fs.appendFile(file, os.EOL + os.EOL);
 
     highlights.forEach(async (highlight) => {
       await fs.appendFile(
         file,
-        'Page ' + highlight.page + '\r\n' + highlight.text + '\r\n\r\n'
+        'Page ' + highlight.page + os.EOL + highlight.text + os.EOL + os.EOL
       );
     });
   });
