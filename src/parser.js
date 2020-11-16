@@ -13,6 +13,24 @@ async function tryReadFile(file) {
   }
 }
 
+async function createFolder(folder) {
+  try {
+    await fs.promises.access(folder);
+  } catch (error) {
+    await fs.promises.mkdir(folder);
+  }
+}
+
+function getInformationFromTitle(title) {
+  const authorStartIndex = title.indexOf('(');
+  const authorEndIndex = title.indexOf(')');
+
+  const book = title.slice(0, authorStartIndex - 1);
+  const author = title.slice(authorStartIndex + 1, authorEndIndex);
+
+  return { book, author };
+}
+
 (async () => {
   const { input, pages = true } = minimist(process.argv.slice(2));
 
@@ -54,22 +72,31 @@ async function tryReadFile(file) {
     highlightsMap[title] = highlights.sort((a, b) => a.page - b.page);
   });
 
-  try {
-    await fs.promises.access('output');
-  } catch (error) {
-    await fs.promises.mkdir('output');
+  async function createFolderStructure() {
+    await createFolder('output');
+
+    for (title of Object.keys(highlightsMap)) {
+      const { author } = getInformationFromTitle(title);
+      await createFolder('output' + path.sep + author);
+    }
   }
 
-  await fs.promises.writeFile(
-    'output' + path.sep + 'clippings.json',
-    JSON.stringify(highlightsMap, null, 2)
-  );
+  await createFolderStructure(Object.keys(highlightsMap));
+
+  const jsonFile = 'output' + path.sep + 'clippings.json';
+
+  await fs.promises.writeFile(jsonFile, JSON.stringify(highlightsMap, null, 2));
 
   Object.entries(highlightsMap).forEach(async ([title, highlights]) => {
-    const file = 'output' + path.sep + title + '.txt';
+    const { book, author } = getInformationFromTitle(title);
+    const file = 'output' + path.sep + author + path.sep + book + '.txt';
 
-    // Remove the previous version
-    await fs.promises.unlink(file);
+    // Remove the previous versions
+    try {
+      await fs.promises.unlink(file);
+    } catch (error) {
+      // It's all cool, they just don't exist yet
+    }
 
     const stream = fs.createWriteStream(file, { flags: 'a' });
 
