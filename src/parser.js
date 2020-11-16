@@ -32,7 +32,9 @@ function getInformationFromTitle(title) {
 }
 
 (async () => {
-  const { input, pages = true } = minimist(process.argv.slice(2));
+  const { input, output = 'output', pages = true } = minimist(
+    process.argv.slice(2)
+  );
 
   const content = await tryReadFile(input);
   const clippings = content.split('==========');
@@ -73,23 +75,23 @@ function getInformationFromTitle(title) {
   });
 
   async function createFolderStructure() {
-    await createFolder('output');
+    await createFolder(output);
 
     for (title of Object.keys(highlightsMap)) {
       const { author } = getInformationFromTitle(title);
-      await createFolder('output' + path.sep + author);
+      await createFolder(output + path.sep + author);
     }
   }
 
   await createFolderStructure(Object.keys(highlightsMap));
 
-  const jsonFile = 'output' + path.sep + 'clippings.json';
+  const jsonFile = output + path.sep + 'clippings.json';
 
   await fs.promises.writeFile(jsonFile, JSON.stringify(highlightsMap, null, 2));
 
   Object.entries(highlightsMap).forEach(async ([title, highlights]) => {
     const { book, author } = getInformationFromTitle(title);
-    const file = 'output' + path.sep + author + path.sep + book + '.txt';
+    const file = output + path.sep + author + path.sep + book + '.txt';
 
     // Remove the previous versions
     try {
