@@ -50,6 +50,10 @@ async function tryReadFile(file) {
     highlightsMap[title] = [...pageHighlights, { page, text }];
   });
 
+  Object.entries(highlightsMap).forEach(([title, highlights]) => {
+    highlightsMap[title] = highlights.sort((a, b) => a.page - b.page);
+  });
+
   try {
     await fs.promises.access('output');
   } catch (error) {
