@@ -1,20 +1,31 @@
-# kindle-clippings-parser
+# Kindle Highlights Parser ✂️
 
-A simple tool to parse clippings from your Kindle.
+## Why?
+
+The format in which the Kindle saves your highlights is terrible. It's hard to read, the highlights are sorted chronologically, and it's a nightmare if you want to transfer them into a note-taking app.
+
+This tool helps you make sense of your Kindle highlights. It extracts the highlights for each book into a separate file and groups them by author, so they are easier to find. It also properly sorts them by page.
+
+## Requirements
+
+- [Node.js](https://nodejs.org)
 
 ## Usage
 
 ```
-node ./src/parser.js --input /Users/spsjvc/Desktop/clippings.txt
+$ node ./src/parser.js \
+    --input /Volumes/Kindle/documents/My\ Clippings.txt \
+    --output /Users/dragisa/Documents/Kindle\ Clippings \
+    --no-pages
 ```
 
-### Arguments
+## Parameters
 
-- `--input` Path to the clippings file.
-- `--no-pages` Omits the page numbers from the output.
+- `--input` Path to your Kindle's clippings file
+- `--output` Path to the folder where the highlights should be saved
+  - default: Creates a folder called `output` at the root of the project
+- `--no-pages` Omits the page numbers from the highlights
 
 ## Examples
 
-![alt text](examples/file-contents.png 'File contents')
-
-![alt text](examples/folder-contents.png 'Folder contents')
+![alt text](examples/folder-structure.png 'Folder structure example')
